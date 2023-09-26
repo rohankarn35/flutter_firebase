@@ -1,16 +1,15 @@
-# googledrive
+<h1 align="center" id="title">Flutter Firebase</h1>
 
-A new Flutter project.
+<p align="center"><img src="https://socialify.git.ci/rohankarn35/flutter_firebase/image?description=1&amp;descriptionEditable=Firebase%20CRUD%20operation&amp;font=Source%20Code%20Pro&amp;language=1&amp;name=1&amp;owner=1&amp;pattern=Charlie%20Brown&amp;theme=Light" alt="project-image"></p>
 
-## Getting Started
+<p id="description">Basic Firebase CRUD Operation. File upload and deletion complete.</p>
 
-This project is a starting point for a Flutter application.
+  
+  
+<h2>eatures</h2>
 
-A few resources to get you started if this is your first Flutter project:
+Here're some of the project's best features:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+*   File Upload
+*   File delete
+*   Progress Indicator
