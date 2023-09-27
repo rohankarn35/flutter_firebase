@@ -22,6 +22,7 @@ class _UploadState extends State<Upload> {
   double uploadProgress = 0.0;
   final FirebaseFirestore _firebasefirestore = FirebaseFirestore.instance;
   List<Map<String, dynamic>> pdfData = [];
+  bool doesexit = true;
  
 
   Future<void> uploadPdf(String filename, File file) async {
@@ -66,10 +67,18 @@ class _UploadState extends State<Upload> {
       if (pickedFile != null) {
          var uuid = Uuid();
         String filename = pickedFile.files[0].name;
+        // filecheck(filename);
+
         print(filename);
         File file = File(pickedFile.files[0].path!);
-        await uploadPdf(filename, file); // Wait for the upload to complete
-        final downloadLink = await FirebaseStorage.instance
+        print(doesexit);
+      if (await doesFileExist(filename)) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("File name already exist"), backgroundColor: Colors.red,));
+       
+      } 
+      else{
+         await uploadPdf(filename, file); 
+         final downloadLink = await FirebaseStorage.instance
             .ref()
             .child("pdf/$filename")
             .getDownloadURL();
@@ -78,6 +87,10 @@ class _UploadState extends State<Upload> {
           "url": downloadLink,
           "id": uuid.v4(),
         });
+      }
+      
+      // Wait for the upload to complete
+       
         getPDF();
         print("Pdf upload Sucessfully");
       }
@@ -95,6 +108,17 @@ class _UploadState extends State<Upload> {
     });
   }
 
+Future<bool> doesFileExist (String filename) async{
+  DocumentSnapshot<Map<String, dynamic>> document = await FirebaseFirestore.instance.collection("pdf").doc(filename).get();
+
+
+  if (document.exists) {
+    return false;
+    
+  }else{
+    return true;
+  }
+}
 
 
 
@@ -145,29 +169,35 @@ void deletePDFs(String docid, String filename) async{
       ),
       body: Stack(
         children: [
+          
           if(isUploading)BackdropFilter(filter: ImageFilter.blur(sigmaX: 5,sigmaY: 5),
           child: Container(
             color: Colors.black.withOpacity(0.5),
           ),
+          
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
                if (isUploading)
                 Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // CircularProgressIndicator(),
-                      SizedBox(height: 16),
-                      Text(
-                        'Uploading ${uploadProgress.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Column(
+                        
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text(
+                          'Uploading ${uploadProgress.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
 
