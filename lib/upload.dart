@@ -22,7 +22,13 @@ class _UploadState extends State<Upload> {
   double uploadProgress = 0.0;
   final FirebaseFirestore _firebasefirestore = FirebaseFirestore.instance;
   List<Map<String, dynamic>> pdfData = [];
-  bool doesexit = true;
+  List<String> existingfile = [];
+
+  Future<void> getExistingfile() async{
+    final result =  await _firebasefirestore.collection("pdf").get();
+    existingfile = result.docs.map((e) => e.data()["name"].toString()).toList();
+    print("Existing Files ${existingfile}");
+  }
  
 
   Future<void> uploadPdf(String filename, File file) async {
@@ -70,10 +76,10 @@ class _UploadState extends State<Upload> {
         // filecheck(filename);
 
         print(filename);
+        print(existingfile);
         File file = File(pickedFile.files[0].path!);
-        print(doesexit);
-      if (await doesFileExist(filename)) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("File name already exist"), backgroundColor: Colors.red,));
+      if (existingfile.contains(filename)) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("File name already exist"), backgroundColor: Colors.red, duration: Duration(milliseconds: 300), ));
        
       } 
       else{
@@ -90,7 +96,7 @@ class _UploadState extends State<Upload> {
       }
       
       // Wait for the upload to complete
-       
+       existingfile.add(filename);
         getPDF();
         print("Pdf upload Sucessfully");
       }
@@ -108,17 +114,6 @@ class _UploadState extends State<Upload> {
     });
   }
 
-Future<bool> doesFileExist (String filename) async{
-  DocumentSnapshot<Map<String, dynamic>> document = await FirebaseFirestore.instance.collection("pdf").doc(filename).get();
-
-
-  if (document.exists) {
-    return false;
-    
-  }else{
-    return true;
-  }
-}
 
 
 
@@ -139,6 +134,7 @@ Future<void> deletPDF(String filename) async{
   try {
     final reference = FirebaseStorage.instance.ref().child("pdf/$filename");
     await reference.delete();
+    
     print("Deleted from storage");
   } catch (e) {
     print("Error deleting: $e");
@@ -149,6 +145,10 @@ Future<void> deletPDF(String filename) async{
 void deletePDFs(String docid, String filename) async{
   await deleteFile(docid);
   await deletPDF(filename);
+  getExistingfile();
+  existingfile.remove(filename);
+
+  print("Existing file after delete ${existingfile}");
   getPDF();
 }
 // 
@@ -157,6 +157,7 @@ void deletePDFs(String docid, String filename) async{
     // TODO: implement initState
     super.initState();
     getPDF();
+    getExistingfile();
   }
 
   @override
